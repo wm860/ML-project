@@ -1,7 +1,13 @@
-Aplikacja ma za zadanie wyznaczyć na podstawie krótkiej ankiety użytkownika prawdopodobieństwo wystąpienia u niego problemów z nadwagą.
+Application is made for probability estimation of recurence of breast cancer based on user's data.
 
-Do tego celu wykorzystano zbiór danhych zawierający informacje o prawie 2000 ludzi, ich wieku, płci, wzroście, wadze, ilości spożywanych posiłków, aktywności fizycznej, itp.
+Application has poll for user to fill. Based on this data, application uses Random Forest with Naive Bayes classifiers to estimate
+probability of breast cancer recurence.
+Application also shows quality of prediction, which is accuracy of classification, so user can see how reliable is the result.
 
-Na podstawie tych danych oraz algorytmu klasyfikacji wykorzystującej las losowy z naiwnymi klasyfikatorami bayesa, aplikacja wyznacza prawdopodobieństwo wystąpienia problemów z nadwagą u użytkownika.
-Dodatkowo podawana jest również jakość predykcji, czyli dokładność klasyfikacji.
+As a result I get machine learning model, which can be used to estimate the future condition of patient health.
 
+Few pictures of application:
+
+
+
+Used data: https://archive.ics.uci.edu/dataset/14/breast+cancer
