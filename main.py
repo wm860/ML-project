@@ -1,5 +1,4 @@
 from bayes_forest import *
-import time
 import PySimpleGUI as sg
 
 def print_hi(name):
@@ -51,20 +50,26 @@ def classification3():
     accuracy = accuracy_score(y_test_cancer, y_pred2)
     print(f"Accuracy3: {accuracy}")
     print(y_predicted)
+def classification4():
+    filename_cancer = "breast-cancer.data"
+    filename_app_data = "breast_data_to_classification_poll.csv"
+    data_cancer = read_data(filename_cancer, 0)
+    data_to_classification = read_data(filename_app_data,0)
+    train_data_cancer, test_data_cancer = split_data(data_cancer)
+    x_train_cancer, y_train_cancer = encoding(train_data_cancer)
+    x_test_cancer, y_test_cancer = encoding(test_data_cancer)
 
-def gui():
-    layout = [[sg.Text('Enter something on Row 2'), sg.InputText()],
-              [sg.Button('Ok'), sg.Button('Cancel')]]
+    x_to_predict, y_to_predict = encoding(data_to_classification)
 
-    window = sg.Window('Window Title', layout)
+    random_forest = RandomForest(30,NaiveBayes)  # Create a random forest with 100 trees of naive bayes classifications
+    random_forest.fit(x_train_cancer, y_train_cancer)
+    y_pred2 = random_forest.predict(x_test_cancer)
+    y_predicted = random_forest.predict(x_to_predict)
+    accuracy = accuracy_score(y_test_cancer, y_pred2)
+    print(f"Accuracy3: {accuracy}")
+    print(y_predicted)
+    return accuracy, y_predicted
 
-    while True:
-        event, values = window.read()
-        if event in (None, 'Cancel'):
-            break
-        print('You entered ', values[0])
-
-    window.close()
 def gui2():
     layout = [
         [sg.Text('Breast cancer predisposition poll', size=(30, 1), font=("Helvetica", 25), text_color='green')],
@@ -107,12 +112,23 @@ def gui3():
         [sg.Combo(['lt40', 'ge40', 'premeno'], key='-OPTION2-', default_value='premeno')],
         [sg.Text('Tumor size:')],
         [sg.Combo(['0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59'], key='-OPTION3-', default_value='0-4')],
+        [sg.Text('INV nodes:')],
+        [sg.Combo(
+            ['0-2', '3-5', '6-8', '9-11', '12-14', '15-17', '18-20', '21-23', '24-26', '27-29', '30-32', '33-35', '36-39'],
+            key='-OPTION4-', default_value='0-2')],
+        [sg.Text('Node caps:')],
+        [sg.Combo(['yes', 'no'], key='-OPTION5-', default_value='no')],
+        [sg.Text('Deg malig:')],
+        [sg.Combo(['1', '2', '3'], key='-OPTION6-', default_value='1')],
+        [sg.Text('Breast:')],
+        [sg.Combo(['left', 'right'], key='-OPTION7-', default_value='left')],
+        [sg.Text('Breast quad:')],
+        [sg.Combo(['left-up', 'left-low', 'right-up','right-low', 'central'], key='-OPTION8-', default_value='left-up')],
+        [sg.Text('irradiat:')],
+        [sg.Combo(['yes', 'no'], key='-OPTION8-', default_value='yes')],
         [sg.Button('OK'), sg.Button('Anuluj')]
     ]
-
-    # Tworzenie okna
-    window = sg.Window('Lista rozwijana', layout)
-
+    window = sg.Window('cancer app', layout)
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == 'Anuluj':
@@ -121,21 +137,41 @@ def gui3():
             selected_option1 = values['-OPTION-']
             selected_option2 = values['-OPTION2-']
             selected_option3 = values['-OPTION3-']
-            options = [selected_option1, selected_option2, selected_option3]
-            sg.popup(f'Your responses: {selected_option1}, {selected_option2}, {selected_option3}')
+            selected_option4 = values['-OPTION4-']
+            selected_option5 = values['-OPTION5-']
+            selected_option6 = values['-OPTION6-']
+            selected_option7 = values['-OPTION7-']
+            selected_option8 = values['-OPTION8-']
+            options = [selected_option1, selected_option2, selected_option3, selected_option4, selected_option5, selected_option6, selected_option7, selected_option8]
+            sg.popup(f'Your responses: {selected_option1}, {selected_option2}, {selected_option3}, {selected_option4}, {selected_option5}, {selected_option6}, {selected_option7}, {selected_option8}')
             return options
     window.close()
     #return options
+def gui_final(acc, pred):
+    layout = \
+    [
+        [sg.Text('Your predisposition to breast cancer is:')],
+        [sg.Text(f'{pred} with AI accuracy of: {acc}')]
+    ]
+    window = sg.Window('cancer app', layout)
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            break
+    window.close()
+def save_data_to_file(data):
+    data = [item.replace("[", "").replace("]", "").replace("'", "") for item in data]
+    data_string = ','.join(data)
+    with open('breast_data_to_classification_poll.csv', 'w') as file:
+        file.write(data_string + '\n')
 
 if __name__ == '__main__':
 
-    #classification()
-    #classification2()
-    #classification3()
-    #gui()
-    #gui2()
-    a=[]
     a=gui3()
+    a.insert(0, 'no_class')
     print(a)
+    save_data_to_file(a)
+    acc, pred = classification4()
+    gui_final(acc,pred)
     displayText()
 
